@@ -84,6 +84,21 @@ class GomokuPygame:
 
             self.current_player = self.ai_player
 
+    def handle_human_turn_two(self, pos):
+        """
+        Maneja el turno del jugador humano.
+        :param pos: Posición del mouse.
+        """
+        row, col = self.get_cell_from_mouse(pos)
+        if self.board.is_valid_move((row, col), "O"):
+            self.board.make_move((row, col), "O")
+            if self.board.check_winner("O"):
+                self.show_message("¡Humano 2 gana!")
+                pygame.quit()
+                exit()
+
+            self.current_player = self.human_player
+
     def handle_ai_turn(self):
         """
         Maneja el turno de la IA.
@@ -114,6 +129,23 @@ class GomokuPygame:
         """
         Corre el bucle principal del juego.
         """
+        print("¡Bienvenido al juego de Gomoku!")
+        print("Selecciona el modo de juego:")
+        print("1. Humano vs. IA")
+        print("2. Humano vs. Humano")
+
+        while True:
+            try:
+                mode = int(input("Elige 1 o 2: "))
+                if mode in [1, 2]:
+                    break
+                else:
+                    print("Por favor, ingresa 1 o 2.")
+            except ValueError:
+                print("Entrada inválida. Por favor, ingresa 1 o 2.")
+
+        # Configurar jugadores según el modo elegido
+
         running = True
         while running:
             for event in pygame.event.get():
@@ -123,8 +155,10 @@ class GomokuPygame:
                     self.handle_human_turn(event.pos)
 
             # Si es el turno de la IA
-            if self.current_player == self.ai_player:
+            if self.current_player == self.ai_player and mode == 1:
                 self.handle_ai_turn()
+            elif event.type == pygame.MOUSEBUTTONDOWN and self.current_player == self.ai_player:
+                self.handle_human_turn_two(event.pos)
 
             # Dibujar el tablero
             self.draw_board()
