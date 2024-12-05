@@ -12,7 +12,7 @@ class AIPlayer:
 
     def get_best_move(self, board):
         """
-        Calcula el mejor movimiento basado en prioridades especificadas.
+        Calcula el mejor movimiento basado en prioridades: ganar, capturar, bloquear, o evaluar con Minimax.
         :param board: Instancia del tablero (clase Board).
         :return: Una tupla (fila, columna) que representa el movimiento elegido por la IA.
         """
@@ -21,60 +21,54 @@ class AIPlayer:
         if winning_move:
             return winning_move
 
-        # Prioridad 2: Bloquear alineaciones enemigas de 4 consecutivas
-        block_four_move = self.find_block_move(board, length=4)
-        if block_four_move:
-            return block_four_move
-
-        # Prioridad 3: Generar alineaciones de 4 abiertas
-        create_open_four = self.create_open_alignment(board, length=4)
-        if create_open_four:
-            return create_open_four
-
-        # Prioridad 4: Jugadas que capturan
+        # Prioridad 2: Jugadas que capturan
         capture_move = self.find_capture_move(board)
         if capture_move:
             return capture_move
 
-        # Prioridad 5: Bloquear alineaciones enemigas de 3 consecutivas
-        block_three_move = self.find_block_move(board, length=3)
-        if block_three_move:
-            return block_three_move
+        # Prioridad 3: Bloquear alineaciones peligrosas del oponente
+        block_move = self.find_block_move(board)
+        if block_move:
+            return block_move
 
-        # Prioridad 6: Alinear 4 abiertas por 1 lado o 3 abiertas por ambos lados
-        strategic_alignment = self.create_partial_alignment(board)
-        if strategic_alignment:
-            return strategic_alignment
-
-        # Prioridad 7: Evaluar con Minimax
+        # Prioridad 4: Evaluar con Minimax
         _, best_move = self.minimax(board, depth=2, maximizing_player=True)
-        if best_move:
-            return best_move
-
-        # Prioridad 8: Jugar en esquinas
-        corner_move = self.find_corner_move(board)
-        if corner_move:
-            return corner_move
-
-        # Prioridad 9: Jugar en los bordes
-        edge_move = self.find_edge_move(board)
-        if edge_move:
-            return edge_move
-
-        # Default: Movimiento aleatorio
-        return random.choice(board.get_empty_positions())
+        return best_move
 
     def find_winning_move(self, board):
-        # Busca movimientos que permitan ganar
-        return self.find_specific_alignment(board, self.symbol, 4, to_win=True)
+        """
+        Encuentra un movimiento que permita ganar inmediatamente.
+        :param board: Instancia del tablero.
+        :return: Una tupla (fila, columna) o None si no hay movimientos ganadores.
+        """
+        directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
 
-    def find_block_move(self, board, length):
-        # Busca movimientos que bloqueen alineaciones del oponente
-        opponent_symbol = "X" if self.symbol == "O" else "O"
-        return self.find_specific_alignment(board, opponent_symbol, length, to_win=False)
+        for row in range(board.size):
+            for col in range(board.size):
+                if board.grid[row][col] != ".":
+                    continue
+                for dr, dc in directions:
+                    count = 0
+                    for step in range(-4, 5):  # Verificar 9 posiciones alrededor
+                        r, c = row + dr * step, col + dc * step
+                        if (
+                            0 <= r < board.size
+                            and 0 <= c < board.size
+                            and board.grid[r][c] == self.symbol
+                        ):
+                            count += 1
+                        else:
+                            break
+                    if count >= 4:  # Jugada que completa 5
+                        return row, col
+        return None
 
     def find_capture_move(self, board):
-        # Encuentra un movimiento que capture piezas del oponente
+        """
+        Encuentra un movimiento que capture piezas del oponente.
+        :param board: Instancia del tablero.
+        :return: Una tupla (fila, columna) o None si no hay movimientos de captura disponibles.
+        """
         opponent_symbol = "X" if self.symbol == "O" else "O"
         directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
 
@@ -101,19 +95,13 @@ class AIPlayer:
                         return row, col
         return None
 
-    def create_open_alignment(self, board, length):
-        # Genera alineaciones abiertas de la longitud especificada
-        return self.find_specific_alignment(board, self.symbol, length, open_ends=2)
-
-    def create_partial_alignment(self, board):
-        # Genera alineaciones de 4 abiertas por un lado o 3 abiertas por ambos lados
-        partial_four = self.find_specific_alignment(board, self.symbol, 4, open_ends=1)
-        if partial_four:
-            return partial_four
-        return self.find_specific_alignment(board, self.symbol, 3, open_ends=2)
-
-    def find_specific_alignment(self, board, symbol, length, to_win=False, open_ends=0):
-        # Encuentra movimientos que logren una alineación específica
+    def find_block_move(self, board):
+        """
+        Encuentra un movimiento para bloquear alineaciones peligrosas del oponente.
+        :param board: Instancia del tablero.
+        :return: Una tupla (fila, columna) o None si no hay bloqueos necesarios.
+        """
+        opponent_symbol = "X" if self.symbol == "O" else "O"
         directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
 
         for row in range(board.size):
@@ -122,43 +110,35 @@ class AIPlayer:
                     continue
                 for dr, dc in directions:
                     aligned_count = 0
-                    open_count = 0
-                    for step in range(-length, length + 1):
+                    open_ends = 0
+                    for step in range(-4, 5):  # Verificar alineaciones del oponente
                         r, c = row + dr * step, col + dc * step
-                        if 0 <= r < board.size and 0 <= c < board.size:
-                            if board.grid[r][c] == symbol:
-                                aligned_count += 1
-                            elif board.grid[r][c] == ".":
-                                open_count += 1
+                        if (
+                            0 <= r < board.size
+                            and 0 <= c < board.size
+                            and board.grid[r][c] == opponent_symbol
+                        ):
+                            aligned_count += 1
+                        elif (
+                            0 <= r < board.size
+                            and 0 <= c < board.size
+                            and board.grid[r][c] == "."
+                        ):
+                            open_ends += 1
                         else:
                             break
-
-                    if aligned_count == length and (open_count >= open_ends or to_win):
+                    if aligned_count >= 2 and open_ends >= 2:  # Bloquear alineaciones abiertas
                         return row, col
         return None
 
-    def find_corner_move(self, board):
-        # Encuentra movimientos en las esquinas
-        corners = [(0, 0), (0, board.size - 1), (board.size - 1, 0), (board.size - 1, board.size - 1)]
-        for corner in corners:
-            if board.grid[corner[0]][corner[1]] == ".":
-                return corner
-        return None
-
-    def find_edge_move(self, board):
-        # Encuentra movimientos en los bordes
-        for row in [0, board.size - 1]:
-            for col in range(board.size):
-                if board.grid[row][col] == ".":
-                    return row, col
-        for col in [0, board.size - 1]:
-            for row in range(board.size):
-                if board.grid[row][col] == ".":
-                    return row, col
-        return None
-
     def minimax(self, board, depth, maximizing_player):
-        # Algoritmo Minimax simplificado
+        """
+        Algoritmo Minimax simplificado con heurísticas.
+        :param board: Instancia del tablero.
+        :param depth: Profundidad máxima de búsqueda.
+        :param maximizing_player: True si es el turno de la IA, False para el oponente.
+        :return: Mejor puntuación y movimiento (row, col).
+        """
         if depth == 0 or board.is_game_over():
             return self.evaluate_board(board), None
 
@@ -166,28 +146,36 @@ class AIPlayer:
 
         if maximizing_player:
             max_eval = float('-inf')
-            for move in board.get_empty_positions():
-                board.make_move(move, self.symbol)
-                eval_score, _ = self.minimax(board, depth - 1, False)
-                board.undo_move(move)
-                if eval_score > max_eval:
-                    max_eval = eval_score
-                    best_move = move
+            for row in range(board.size):
+                for col in range(board.size):
+                    if board.is_valid_move((row, col), self.symbol):
+                        board.make_move((row, col), self.symbol)
+                        eval_score, _ = self.minimax(board, depth - 1, False)
+                        board.grid[row][col] = "."  # Deshacer movimiento
+                        if eval_score > max_eval:
+                            max_eval = eval_score
+                            best_move = (row, col)
             return max_eval, best_move
         else:
             opponent_symbol = "X" if self.symbol == "O" else "O"
             min_eval = float('inf')
-            for move in board.get_empty_positions():
-                board.make_move(move, opponent_symbol)
-                eval_score, _ = self.minimax(board, depth - 1, True)
-                board.undo_move(move)
-                if eval_score < min_eval:
-                    min_eval = eval_score
-                    best_move = move
+            for row in range(board.size):
+                for col in range(board.size):
+                    if board.is_valid_move((row, col), opponent_symbol):
+                        board.make_move((row, col), self.symbol)
+                        eval_score, _ = self.minimax(board, depth - 1, True)
+                        board.grid[row][col] = "."  # Deshacer movimiento
+                        if eval_score < min_eval:
+                            min_eval = eval_score
+                            best_move = (row, col)
             return min_eval, best_move
 
     def evaluate_board(self, board):
-        # Evalúa el tablero
+        """
+        Evalúa el estado del tablero basado en capturas y alineaciones simples.
+        :param board: Instancia del tablero.
+        :return: Puntuación del tablero desde la perspectiva de la IA.
+        """
         score = 0
         opponent_symbol = "X" if self.symbol == "O" else "O"
 
@@ -203,4 +191,3 @@ class AIPlayer:
         score -= board.captures[opponent_symbol] * 100
 
         return score
-

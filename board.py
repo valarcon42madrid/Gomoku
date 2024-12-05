@@ -15,27 +15,6 @@ class Board:
         print()
         print(f"Capturas: X = {self.captures['X']}, O = {self.captures['O']}")
 
-    def get_empty_positions(self):
-        """
-        Devuelve una lista de todas las posiciones vacías en el tablero.
-        :return: Lista de tuplas (fila, columna) para las posiciones vacías.
-        """
-        empty_positions = []
-        for row in range(self.size):
-            for col in range(self.size):
-                if self.grid[row][col] == ".":
-                    empty_positions.append((row, col))
-        return empty_positions
-
-    def undo_move(self, move):
-        """
-        Revierte un movimiento en el tablero.
-        :param move: Una tupla (fila, columna) que indica el movimiento a deshacer.
-        """
-        row, col = move
-        if 0 <= row < self.size and 0 <= col < self.size:
-            self.grid[row][col] = "."
-
     def make_move(self, move, symbol):
         """
         Intenta realizar un movimiento en el tablero.
