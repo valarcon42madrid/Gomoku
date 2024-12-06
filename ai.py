@@ -26,11 +26,6 @@ class AIPlayer:
         if block_four_move:
             return block_four_move
 
-        # Prioridad 3: Generar alineaciones de 4 abiertas
-        create_open_four = self.create_open_alignment(board, length=4)
-        if create_open_four:
-            return create_open_four
-
         # Prioridad 4: Jugadas que capturan
         capture_move = self.find_capture_move(board)
         if capture_move:
@@ -40,6 +35,11 @@ class AIPlayer:
         block_three_move = self.find_block_move(board, length=3)
         if block_three_move:
             return block_three_move
+
+      # Prioridad 3: Generar alineaciones de 4 abiertas
+        create_open_four = self.create_open_alignment(board, length=4)
+        if create_open_four:
+            return create_open_four
 
         # Prioridad 6: Alinear 4 abiertas por 1 lado o 3 abiertas por ambos lados
         strategic_alignment = self.create_partial_alignment(board)
