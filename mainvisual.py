@@ -1,4 +1,3 @@
-
 import pygame
 from board import Board
 from player import Player
@@ -12,6 +11,8 @@ LINE_COLOR = (0, 0, 0)
 BACKGROUND_COLOR = (200, 200, 200)
 HUMAN_COLOR = (0, 0, 255)
 AI_COLOR = (255, 0, 0)
+BUTTON_COLOR = (100, 200, 100)
+TEXT_COLOR = (255, 255, 255)
 
 class GomokuPygame:
     def __init__(self):
@@ -25,40 +26,7 @@ class GomokuPygame:
         self.human_player = Player("Humano", "X")
         self.ai_player = AIPlayer("IA", "O")
         self.current_player = self.human_player
-
-    def draw_board(self):
-        """
-        Dibuja el tablero en la ventana de Pygame.
-        """
-        self.window.fill(BACKGROUND_COLOR)
-
-        # Dibujar líneas del tablero
-        for i in range(BOARD_SIZE):
-            pygame.draw.line(
-                self.window, LINE_COLOR, (i * CELL_SIZE, 0), (i * CELL_SIZE, WINDOW_SIZE)
-            )
-            pygame.draw.line(
-                self.window, LINE_COLOR, (0, i * CELL_SIZE), (WINDOW_SIZE, i * CELL_SIZE)
-            )
-
-        # Dibujar las piezas
-        for row in range(BOARD_SIZE):
-            for col in range(BOARD_SIZE):
-                symbol = self.board.grid[row][col]
-                if symbol == "X":
-                    pygame.draw.circle(
-                        self.window,
-                        HUMAN_COLOR,
-                        (col * CELL_SIZE + CELL_SIZE // 2, row * CELL_SIZE + CELL_SIZE // 2),
-                        CELL_SIZE // 3,
-                    )
-                elif symbol == "O":
-                    pygame.draw.circle(
-                        self.window,
-                        AI_COLOR,
-                        (col * CELL_SIZE + CELL_SIZE // 2, row * CELL_SIZE + CELL_SIZE // 2),
-                        CELL_SIZE // 3,
-                    )
+        self.mode = None  # Modo de juego: 1 = Humano vs IA, 2 = Humano vs Humano
 
     def get_cell_from_mouse(self, pos):
         """
@@ -68,7 +36,7 @@ class GomokuPygame:
         """
         x, y = pos
         return y // CELL_SIZE, x // CELL_SIZE
-
+    
     def handle_human_turn(self, pos):
         """
         Maneja el turno del jugador humano.
@@ -125,27 +93,88 @@ class GomokuPygame:
         pygame.display.update()
         pygame.time.wait(3000)
 
+    def draw_board(self):
+        """
+        Dibuja el tablero en la ventana de Pygame.
+        """
+        self.window.fill(BACKGROUND_COLOR)
+
+        # Dibujar líneas del tablero
+        for i in range(BOARD_SIZE):
+            pygame.draw.line(
+                self.window, LINE_COLOR, (i * CELL_SIZE, 0), (i * CELL_SIZE, WINDOW_SIZE)
+            )
+            pygame.draw.line(
+                self.window, LINE_COLOR, (0, i * CELL_SIZE), (WINDOW_SIZE, i * CELL_SIZE)
+            )
+
+        # Dibujar las piezas
+        for row in range(BOARD_SIZE):
+            for col in range(BOARD_SIZE):
+                symbol = self.board.grid[row][col]
+                if symbol == "X":
+                    pygame.draw.circle(
+                        self.window,
+                        HUMAN_COLOR,
+                        (col * CELL_SIZE + CELL_SIZE // 2, row * CELL_SIZE + CELL_SIZE // 2),
+                        CELL_SIZE // 3,
+                    )
+                elif symbol == "O":
+                    pygame.draw.circle(
+                        self.window,
+                        AI_COLOR,
+                        (col * CELL_SIZE + CELL_SIZE // 2, row * CELL_SIZE + CELL_SIZE // 2),
+                        CELL_SIZE // 3,
+                    )
+
+    def draw_menu(self):
+        """
+        Dibuja el menú inicial para seleccionar el modo de juego.
+        """
+        self.window.fill(BACKGROUND_COLOR)
+        font = pygame.font.Font(None, 74)
+
+        # Botón 1: Humano vs IA
+        button_1 = pygame.Rect(WINDOW_SIZE // 4, WINDOW_SIZE // 3, WINDOW_SIZE // 2, 50)
+        pygame.draw.rect(self.window, BUTTON_COLOR, button_1)
+        text_1 = font.render("Humano vs IA", True, TEXT_COLOR)
+        self.window.blit(text_1, (button_1.x + 20, button_1.y + 5))
+
+        # Botón 2: Humano vs Humano
+        button_2 = pygame.Rect(WINDOW_SIZE // 4, WINDOW_SIZE // 2, WINDOW_SIZE // 2, 50)
+        pygame.draw.rect(self.window, BUTTON_COLOR, button_2)
+        text_2 = font.render("Humano vs Humano", True, TEXT_COLOR)
+        self.window.blit(text_2, (button_2.x + 5, button_2.y + 5))
+
+        pygame.display.flip()
+        return button_1, button_2
+
+    def handle_menu_click(self, pos, button_1, button_2):
+        """
+        Maneja el clic en el menú inicial.
+        """
+        if button_1.collidepoint(pos):
+            return 1  # Modo Humano vs IA
+        elif button_2.collidepoint(pos):
+            return 2  # Modo Humano vs Humano
+        return None
+
     def run(self):
         """
         Corre el bucle principal del juego.
         """
-        print("¡Bienvenido al juego de Gomoku!")
-        print("Selecciona el modo de juego:")
-        print("1. Humano vs. IA")
-        print("2. Humano vs. Humano")
+        # Pantalla de selección de modo de juego
+        button_1, button_2 = self.draw_menu()
 
-        while True:
-            try:
-                mode = int(input("Elige 1 o 2: "))
-                if mode in [1, 2]:
-                    break
-                else:
-                    print("Por favor, ingresa 1 o 2.")
-            except ValueError:
-                print("Entrada inválida. Por favor, ingresa 1 o 2.")
+        while self.mode is None:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    self.mode = self.handle_menu_click(event.pos, button_1, button_2)
 
-        # Configurar jugadores según el modo elegido
-
+        # Bucle principal del juego
         running = True
         while running:
             for event in pygame.event.get():
@@ -155,7 +184,7 @@ class GomokuPygame:
                     self.handle_human_turn(event.pos)
 
             # Si es el turno de la IA
-            if self.current_player == self.ai_player and mode == 1:
+            if self.current_player == self.ai_player and self.mode == 1:
                 self.handle_ai_turn()
             elif event.type == pygame.MOUSEBUTTONDOWN and self.current_player == self.ai_player:
                 self.handle_human_turn_two(event.pos)
@@ -171,4 +200,5 @@ class GomokuPygame:
 if __name__ == "__main__":
     game = GomokuPygame()
     game.run()
+
 
