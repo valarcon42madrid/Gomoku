@@ -15,6 +15,27 @@ class Board:
         print()
         print(f"Capturas: X = {self.captures['X']}, O = {self.captures['O']}")
 
+    def get_empty_positions(self):
+        """
+        Devuelve una lista de todas las posiciones vacías en el tablero.
+        :return: Lista de tuplas (fila, columna) para las posiciones vacías.
+        """
+        empty_positions = []
+        for row in range(self.size):
+            for col in range(self.size):
+                if self.grid[row][col] == ".":
+                    empty_positions.append((row, col))
+        return empty_positions
+
+    def undo_move(self, move):
+        """
+        Revierte un movimiento en el tablero.
+        :param move: Una tupla (fila, columna) que indica el movimiento a deshacer.
+        """
+        row, col = move
+        if 0 <= row < self.size and 0 <= col < self.size:
+            self.grid[row][col] = "."
+
     def make_move(self, move, symbol):
         """
         Intenta realizar un movimiento en el tablero.
@@ -26,6 +47,19 @@ class Board:
         if self.is_valid_move(move, symbol):
             self.grid[row][col] = symbol
             self.check_and_execute_capture(row, col, symbol)  # Verificar si ocurre captura
+            return True
+        return False
+
+    def make_move_nocap(self, move, symbol):
+        """
+        Intenta realizar un movimiento en el tablero.
+        :param move: (fila, columna)
+        :param symbol: símbolo del jugador ('X' o 'O')
+        :return: True si el movimiento es válido, False si no lo es.
+        """
+        row, col = move
+        if self.is_valid_move(move, symbol):
+            self.grid[row][col] = symbol
             return True
         return False
 
