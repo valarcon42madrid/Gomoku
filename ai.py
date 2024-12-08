@@ -51,15 +51,15 @@ class AIPlayer:
         if best_move:
             return best_move
 
-        # Prioridad 8: Jugar en esquinas
-        corner_move = self.find_corner_move(board)
-        if corner_move:
-            return corner_move
-
         # Prioridad 9: Jugar en los bordes
         edge_move = self.find_edge_move(board)
         if edge_move:
             return edge_move
+        
+        # Prioridad 8: Jugar en esquinas
+        corner_move = self.find_corner_move(board)
+        if corner_move:
+            return corner_move
 
         # Default: Movimiento aleatorio
         return random.choice(board.get_empty_positions())
