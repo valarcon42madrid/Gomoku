@@ -6,6 +6,7 @@ class Board:
         self.size = size
         self.grid = [["." for _ in range(size)] for _ in range(size)]
         self.captures = {"X": 0, "O": 0}  # Capturas acumuladas por cada jugador
+        self.towin = "."
 
     def display(self):
         """Muestra el tablero en la consola."""
@@ -97,6 +98,9 @@ class Board:
     
         o_symbol = "X" if symbol == "O" else "O"
 
+        if (self.towin == symbol):
+            return True
+        
         directions = [
             (1, 0),  # Vertical
             (0, 1),  # Horizontal
@@ -122,7 +126,7 @@ class Board:
                 mid_r1, mid_c1 = check_row, check_col
                 mid_r2, mid_c2 = check_row + ddr, check_col + ddc
                 
-                print(self.grid[prev_r][prev_c] + " " + self.grid[mid_r1][mid_c1] + " " + self.grid[mid_r2][mid_c2] + " " + self.grid[next_r][next_c])
+                self.towin = symbol
                 # Verificar si la configuración es "enemy + symbol + symbol + espacio"
                 if (
                     self.grid[prev_r][prev_c] == o_symbol
@@ -164,7 +168,9 @@ class Board:
                             count += 1
                         else:
                             break
-                    if count == 5 and self.ft_notcap(row, col, dr, dc, symbol):
+                    if (self.towin == symbol and count >= 5):
+                        return True
+                    if count >= 5 and self.ft_notcap(row, col, dr, dc, symbol):
                         return True
         return False
 
