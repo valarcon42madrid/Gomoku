@@ -13,3 +13,5 @@ python main.py
 
  
  ¿Añadir Makefile, subject completo?
+
+ LA AI a mi ya me gana T.T.... ¿Tu la ganas? xP
