@@ -85,7 +85,9 @@ class GomokuPygame:
         Muestra un mensaje emergente con el resultado del juego.
         :param message: Mensaje a mostrar.
         """
+        self.draw_board()
         pygame.display.flip()
+        pygame.time.wait(1000)
         font = pygame.font.Font(None, 74)
         text = font.render(message, True, (255, 0, 0))
         self.window.fill(BACKGROUND_COLOR)
