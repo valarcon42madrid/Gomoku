@@ -100,7 +100,9 @@ class GomokuPygame:
         Dibuja el tablero en la ventana de Pygame.
         """
         self.window.fill(BACKGROUND_COLOR)
-
+        font = pygame.font.Font(None, 20)
+        text = font.render(f"Capturas por: Azul = {self.board.captures['X']}, Rojo = {self.board.captures['O']}", True, (50, 125, 100))
+        self.window.blit(text, (WINDOW_SIZE // 3, WINDOW_SIZE // 2))
         # Dibujar líneas del tablero
         for i in range(BOARD_SIZE):
             pygame.draw.line(
