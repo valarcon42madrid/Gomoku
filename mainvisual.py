@@ -193,6 +193,10 @@ class GomokuPygame:
             elif event.type == pygame.MOUSEBUTTONDOWN and self.current_player == self.ai_player:
                 self.handle_human_turn_two(event.pos)
 
+            if self.board.acabose != ".":
+                self.show_message("Gana el de " + self.board.acabose)
+                pygame.quit()
+                exit()
             # Dibujar el tablero
             self.draw_board()
             pygame.display.flip()

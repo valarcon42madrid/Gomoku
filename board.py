@@ -6,7 +6,9 @@ class Board:
         self.size = size
         self.grid = [["." for _ in range(size)] for _ in range(size)]
         self.captures = {"X": 0, "O": 0}  # Capturas acumuladas por cada jugador
-        self.towin = "."
+        self.towinx = "."
+        self.towino = "."
+        self.acabose = "."
 
     def display(self):
         """Muestra el tablero en la consola."""
@@ -48,6 +50,8 @@ class Board:
         if self.is_valid_move(move, symbol):
             self.grid[row][col] = symbol
             self.check_and_execute_capture(row, col, symbol)  # Verificar si ocurre captura
+            # if self.towin == symbol:
+            #     self.towin = "."
             return True
         return False
 
@@ -98,9 +102,17 @@ class Board:
     
         o_symbol = "X" if symbol == "O" else "O"
 
-        if (self.towin == symbol):
+        if (self.towino == symbol):
+            return True
+        if (self.towinx == symbol):
             return True
         
+        if symbol == "O":
+            self.towino = symbol
+        if symbol == "X":
+            self.towinx = symbol
+
+
         directions = [
             (1, 0),  # Vertical
             (0, 1),  # Horizontal
@@ -126,7 +138,7 @@ class Board:
                 mid_r1, mid_c1 = check_row, check_col
                 mid_r2, mid_c2 = check_row + ddr, check_col + ddc
                 
-                self.towin = symbol
+                
                 # Verificar si la configuración es "enemy + symbol + symbol + espacio"
                 if (
                     self.grid[prev_r][prev_c] == o_symbol
@@ -168,7 +180,7 @@ class Board:
                             count += 1
                         else:
                             break
-                    if (self.towin == symbol and count >= 5):
+                    if ((self.towino == symbol or self.towinx == symbol) and count >= 5):
                         return True
                     if count >= 5 and self.ft_notcap(row, col, dr, dc, symbol):
                         return True
@@ -238,6 +250,7 @@ class Board:
         """
         directions = [(1, 0), (0, 1), (1, 1), (1, -1)]  # Vertical, horizontal, diagonales
         opponent_symbol = "X" if symbol == "O" else "O"
+        saved = False
 
         for dr, dc in directions:
             # Posiciones a verificar hacia adelante
@@ -260,6 +273,7 @@ class Board:
                 self.grid[r1][c1] = "."
                 self.grid[r2][c2] = "."
                 self.captures[symbol] += 2
+                saved = True
 
             # Posiciones a verificar hacia atrás
             r1, c1 = row - dr, col - dc
@@ -281,6 +295,13 @@ class Board:
                 self.grid[r1][c1] = "."
                 self.grid[r2][c2] = "."
                 self.captures[symbol] += 2
+                saved = True
+        if saved == True and symbol == "X":
+            self.towino = "."
+        if saved == True and symbol == "O":
+            self.towinx = "."
+        if (saved == False and (self.towinx == opponent_symbol or self.towino == opponent_symbol)):
+            self.acabose = opponent_symbol
 
 
     def is_game_over(self):

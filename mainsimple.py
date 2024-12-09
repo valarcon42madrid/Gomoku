@@ -65,6 +65,8 @@ def main():
         print("¡Jugador 2 gana por capturas!")
     elif board.is_draw():
         print("¡Es un empate!")
+    elif board.acabose != ".":
+        print("Gana jugador de " + board.acabose)
 
 
 if __name__ == "__main__":
