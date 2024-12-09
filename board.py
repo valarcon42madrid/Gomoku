@@ -83,6 +83,8 @@ class Board:
             opponent_symbol = "X" if symbol == "O" else "O"
             if self.captures[opponent_symbol] >= 8:  # Condición de Endgame Capture
                 return False
+            if self.acabose == ".":
+                return False
             return True
 
         return False
@@ -316,6 +318,8 @@ class Board:
         if self.check_winner("X") or self.check_winner("O"):
             return True
 
+        if self.acabose != ".":
+            return False
         # Comprobar si el tablero está lleno
         return self.is_draw()
 
