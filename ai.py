@@ -38,7 +38,6 @@ class AIPlayer:
             row, col = move
             if board.ft_mininotcap(row, col, self.symbol):
                 return move
-        
         for length in [3, 2]:
             move = self.find_blocking_move_pro(board, opponent_symbol, length)
             if move:

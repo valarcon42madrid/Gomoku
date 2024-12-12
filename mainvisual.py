@@ -45,8 +45,12 @@ class GomokuPygame:
         row, col = self.get_cell_from_mouse(pos)
         if self.board.is_valid_move((row, col), self.human_player.symbol):
             self.board.make_move((row, col), self.human_player.symbol)
+            if self.board.check_winner(self.ai_player.symbol):
+                self.show_message("¡Rojo gana!")
+                pygame.quit()
+                exit()
             if self.board.check_winner(self.human_player.symbol):
-                self.show_message("¡Humano gana!")
+                self.show_message("Azul gana!")
                 pygame.quit()
                 exit()
 
@@ -60,6 +64,10 @@ class GomokuPygame:
         row, col = self.get_cell_from_mouse(pos)
         if self.board.is_valid_move((row, col), "O"):
             self.board.make_move((row, col), "O")
+            if self.board.check_winner("X"):
+                self.show_message("¡Humano 1 gana!")
+                pygame.quit()
+                exit()
             if self.board.check_winner("O"):
                 self.show_message("¡Humano 2 gana!")
                 pygame.quit()
@@ -73,8 +81,12 @@ class GomokuPygame:
         """
         row, col = self.ai_player.get_best_move(self.board)
         self.board.make_move((row, col), self.ai_player.symbol)
+        if self.board.check_winner(self.human_player.symbol):
+            self.show_message("¡Azul gana!")
+            pygame.quit()
+            exit()
         if self.board.check_winner(self.ai_player.symbol):
-            self.show_message("¡IA gana!")
+            self.show_message("¡Rojo gana!")
             pygame.quit()
             exit()
 
