@@ -380,7 +380,7 @@ class Board:
             return True
 
         if self.acabose != ".":
-            return False
+            return True
         # Comprobar si el tablero está lleno
         return self.is_draw()
 
