@@ -158,6 +158,67 @@ class Board:
                     return False
         return True  # Ninguna ficha es capturable
 
+    def ft_mininotcap(self, row, col, symbol):
+        """
+        Comprueba si LA ficha HIPOTÉTICA de la alineación puede ser capturada en cualquier dirección.
+        :param row: fila inicial de la alineación
+        :param col: columna inicial de la alineación
+        :param r: fila final de la alineación
+        :param c: columna final de la alineación
+        :param dr: dirección de fila del incremento
+        :param dc: dirección de columna del incremento
+        :param symbol: símbolo del jugador ('X' o 'O')
+        :return: False si alguna ficha puede ser capturada, True si ninguna puede serlo.
+        """
+    
+        o_symbol = "X" if symbol == "O" else "O"
+
+        if symbol == "X" and self.captures['X'] >= 8:
+            return True
+        if symbol == "O" and self.captures['O'] >= 8:
+            return True
+
+        directions = [
+            (1, 0),  # Vertical
+            (0, 1),  # Horizontal
+            (1, 1),  # Diagonal descendente
+            (1, -1), # Diagonal ascendente
+            (-1, 0),
+            (0, -1),
+            (-1, 1),
+            (-1, -1)
+        ]
+
+        check_row = row
+        check_col = col
+
+        # Para cada ficha, comprobar en todas las direcciones posibles
+        for ddr, ddc in directions:
+                # Coordenadas en los extremos de la configuración
+            prev_r, prev_c = check_row - ddr, check_col - ddc  # Anterior al símbolo
+            next_r, next_c = check_row + ddr * 2, check_col + ddc * 2  # Espacio vacío al final
+
+                # Coordenadas de los dos símbolos centrales
+            mid_r1, mid_c1 = check_row, check_col
+            mid_r2, mid_c2 = check_row + ddr, check_col + ddc
+                
+                
+                # Verificar si la configuración es "enemy + symbol + symbol + espacio"
+            if (
+                self.grid[prev_r][prev_c] == o_symbol
+                and self.grid[mid_r1][mid_c1] == "."
+                and self.grid[mid_r2][mid_c2] == symbol
+                and self.grid[next_r][next_c] == "."
+            ):
+                return False  # Una ficha es capturable
+            if (
+                self.grid[prev_r][prev_c] == "."
+                and self.grid[mid_r1][mid_c1] == "."
+                and self.grid[mid_r2][mid_c2] == symbol
+                and self.grid[next_r][next_c] == o_symbol
+            ):
+                return False
+        return True  # Ninguna ficha es capturable
 
     def has_alignment(self, symbol):
         """

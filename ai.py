@@ -16,6 +16,7 @@ class AIPlayer:
         :param board: Instancia del tablero (clase Board).
         :return: Una tupla (fila, columna) que representa el movimiento elegido.
         """
+
         # 1. Ganar si es posible
         move = self.find_alignment(board, self.symbol, 4, to_win=True)
         if move:
@@ -23,17 +24,22 @@ class AIPlayer:
 
         # 2. Bloquear amenazas del oponente
         opponent_symbol = "X" if self.symbol == "O" else "O"
-        for length in [5]:
+        for length in [5, 4]:
             move = self.find_blocking_move_pro(board, opponent_symbol, length)
             if move:
                 return move
-
         # 3. Capturar dos fichas enemigas
         move = self.find_capture_move(board)
         if move:
             return move
-
-        for length in [4, 3, 2]:
+        #3.5 proteger de ser capturado
+        move = self.protect_capture_move(board)
+        if move:
+            row, col = move
+            if board.ft_mininotcap(row, col, self.symbol):
+                return move
+        
+        for length in [3, 2]:
             move = self.find_blocking_move_pro(board, opponent_symbol, length)
             if move:
                 return move
@@ -43,17 +49,14 @@ class AIPlayer:
             move = self.block_alignment_extremes(board, opponent_symbol, length)
             if move:
                 return move
-
         # 6. Aplicar heurística minimax
         _, move = self.minimax(board, depth=2, maximizing_player=True)
         if move:
             return move
-
         # 7. Colocar cerca de fichas enemigas
         move = self.near_opponent(board, opponent_symbol)
         if move:
             return move
-
         # Movimiento predeterminado
         return random.choice(board.get_empty_positions())
 
@@ -157,7 +160,35 @@ class AIPlayer:
                     ):
                         return row, col
         return None
+    
+    def protect_capture_move(self, board):
+        # Encuentra un movimiento que capture piezas del oponente
+        opponent_symbol = "X" if self.symbol == "O" else "O"
+        directions = [(1, 0), (0, 1), (1, 1), (1, -1), (-1, 0), (0, -1), (-1, -1), (-1, 1)]
 
+        for row in range(board.size):
+            for col in range(board.size):
+                if board.grid[row][col] != ".":
+                    continue
+                for dr, dc in directions:
+                    r1, c1 = row + dr, col + dc
+                    r2, c2 = row + 2 * dr, col + 2 * dc
+                    r3, c3 = row + 3 * dr, col + 3 * dc
+
+                    if (
+                        0 <= r1 < board.size
+                        and 0 <= c1 < board.size
+                        and 0 <= r2 < board.size
+                        and 0 <= c2 < board.size
+                        and 0 <= r3 < board.size
+                        and 0 <= c3 < board.size
+                        and board.grid[r1][c1] == self.symbol
+                        and board.grid[r2][c2] == self.symbol
+                        and board.grid[r3][c3] == opponent_symbol
+                    ):
+                        return row, col
+        return None
+    
     def block_alignment_extremes(self, board, opponent_symbol, length):
         """
         Bloquea los extremos de alineaciones enemigas.

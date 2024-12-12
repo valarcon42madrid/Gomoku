@@ -194,7 +194,10 @@ class GomokuPygame:
                 self.handle_human_turn_two(event.pos)
 
             if self.board.acabose != ".":
-                self.show_message("Gana el de " + self.board.acabose)
+                if self.board.acabose == "X":
+                    self.show_message("Gana el Azul")
+                else:
+                    self.show_message("Gana el Rojo")
                 pygame.quit()
                 exit()
             # Dibujar el tablero
