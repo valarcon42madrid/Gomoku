@@ -4,7 +4,7 @@ from player import Player
 from ai import AIPlayer
 
 # Constantes de Pygame
-WINDOW_SIZE = 1000
+WINDOW_SIZE = 800
 BOARD_SIZE = 19
 CELL_SIZE = WINDOW_SIZE // BOARD_SIZE
 LINE_COLOR = (0, 0, 0)
@@ -100,7 +100,7 @@ class GomokuPygame:
         self.draw_board()
         pygame.display.flip()
         pygame.time.wait(1000)
-        font = pygame.font.Font(None, 74)
+        font = pygame.font.Font(None, 54)
         text = font.render(message, True, (255, 0, 0))
         self.window.fill(BACKGROUND_COLOR)
         self.window.blit(text, (WINDOW_SIZE // 6, WINDOW_SIZE // 2))
@@ -151,15 +151,15 @@ class GomokuPygame:
         font = pygame.font.Font(None, 74)
 
         # Botón 1: Humano vs IA
-        button_1 = pygame.Rect(WINDOW_SIZE // 19, WINDOW_SIZE // 3, WINDOW_SIZE // 2, 50)
+        button_1 = pygame.Rect(WINDOW_SIZE // 4, WINDOW_SIZE // 3, WINDOW_SIZE // 2, 50)
         pygame.draw.rect(self.window, BUTTON_COLOR, button_1)
         text_1 = font.render("Humano vs IA", True, TEXT_COLOR)
         self.window.blit(text_1, (button_1.x + 20, button_1.y + 5))
 
         # Botón 2: Humano vs Humano
-        button_2 = pygame.Rect(WINDOW_SIZE // 19, WINDOW_SIZE // 5, WINDOW_SIZE // 2, 50)
+        button_2 = pygame.Rect(WINDOW_SIZE // 4, WINDOW_SIZE // 5, WINDOW_SIZE // 2, 50)
         pygame.draw.rect(self.window, BUTTON_COLOR, button_2)
-        text_2 = font.render("Humano vs Humano", True, TEXT_COLOR)
+        text_2 = font.render("Duelo Humano", True, TEXT_COLOR)
         self.window.blit(text_2, (button_2.x + 5, button_2.y + 5))
 
         pygame.display.flip()

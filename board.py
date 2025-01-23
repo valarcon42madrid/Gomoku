@@ -9,6 +9,7 @@ class Board:
         self.towinx = "."
         self.towino = "."
         self.acabose = "."
+        self.firstmove = "S"
 
     def display(self):
         """Muestra el tablero en la consola."""

@@ -16,7 +16,12 @@ class AIPlayer:
         :param board: Instancia del tablero (clase Board).
         :return: Una tupla (fila, columna) que representa el movimiento elegido.
         """
-
+        # 0.Agilizar y optimizar primer movimiento, ya que maxmin es subóptimo (la esquina da pena)
+        if board.firstmove == "S":
+            board.firstmove = "."
+            move = self.firstm(board)
+            if move:
+                return move
         # 1. Ganar si es posible
         move = self.find_alignment(board, self.symbol, 4, to_win=True)
         if move:
@@ -58,6 +63,21 @@ class AIPlayer:
             return move
         # Movimiento predeterminado
         return random.choice(board.get_empty_positions())
+
+    def firstm(self, board):
+        for i in range(board.size):
+            for j in range(board.size):
+                if board.grid[i][j] == "X":
+                    if i > 8:
+                        k = i - 2
+                    else:
+                        k = i + 2
+                    if j > 8:
+                        l = j - 2
+                    else:
+                        l = j + 2
+                    return (k, l)
+        return None
 
     def find_alignment(self, board, symbol, length, to_win=False):
         """
