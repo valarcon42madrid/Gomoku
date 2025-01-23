@@ -76,14 +76,16 @@ class Board:
         :return: True si hay un ganador, False en caso contrario.
         """
         # Victoria por captura
-        if self.captures[symbol] >= 10:
+        opponent_symbol = "X" if symbol == "O" else "O"
+        if self.captures[symbol] >= 10 and self.has_alignment(opponent_symbol) == False:
             return True
+        elif self.captures[symbol] >= 10:
+            self.acabose = opponent_symbol
 
         # Victoria por alineación
         if self.has_alignment(symbol):
-            opponent_symbol = "X" if symbol == "O" else "O"
-            if self.captures[opponent_symbol] >= 8:  # Condición de Endgame Capture
-                return False
+            #if self.captures[opponent_symbol] >= 8:  # Condición de Endgame Capture
+            #    return False
             if self.acabose == ".":
                 return False
             return True
