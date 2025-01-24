@@ -317,6 +317,7 @@ class Board:
         directions = [(1, 0), (0, 1), (1, 1), (1, -1)]  # Vertical, horizontal, diagonales
         opponent_symbol = "X" if symbol == "O" else "O"
         saved = False
+        couldbreak = False
 
         for dr, dc in directions:
             # Posiciones a verificar hacia adelante
@@ -335,6 +336,8 @@ class Board:
                 and self.grid[r2][c2] == opponent_symbol
                 and self.grid[r3][c3] == symbol
             ):
+                if self.has_alignment(opponent_symbol):
+                    couldbreak = True
                 # Captura identificada hacia adelante
                 self.grid[r1][c1] = "."
                 self.grid[r2][c2] = "."
@@ -357,14 +360,19 @@ class Board:
                 and self.grid[r2][c2] == opponent_symbol
                 and self.grid[r3][c3] == symbol
             ):
+                if self.has_alignment(opponent_symbol):
+                    couldbreak = True
                 # Captura identificada hacia atrás
                 self.grid[r1][c1] = "."
                 self.grid[r2][c2] = "."
                 self.captures[symbol] += 2
                 saved = True
-        if saved == True and symbol == "X":
+                
+        if self.has_alignment(opponent_symbol) and couldbreak == True:
+             self.acabose = opponent_symbol
+        if saved == True and symbol == "X" and couldbreak == True:
             self.towino = "."
-        if saved == True and symbol == "O":
+        if saved == True and symbol == "O" and couldbreak == True:
             self.towinx = "."
         if (saved == False and (self.towinx == opponent_symbol or self.towino == opponent_symbol)):
             self.acabose = opponent_symbol
