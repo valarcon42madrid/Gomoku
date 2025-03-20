@@ -1,4 +1,8 @@
-PRE:
+GET READY:
+
+USE "make"
+
+OR DO:
 
 python -m venv mi_entorno 
 
@@ -7,14 +11,11 @@ python -m venv mi_entorno
 pip install pygame
 
 
-PLAY:
+TO PLAY:
 
 python main.py
 
  
-NOTAS:
+NOTES:
 
-He agilizado el primer movimiento de la AI ya que el minmax era un error (ponía en la esquina perjudicando su posición; ahora pone a una distancia de dos de la ficha enemiga)
-
-El ultimo cambio arregla el error de que si puedes capturar 5 alineadas pero capturas en otro lugar, aún continúa la partida.
-Ahora en caso de doble victoria gana el primer jugador ganador.
+It's a modified version of Gomoku (A game based on make an alignement of 5 to win) to make more complex to the AI. Here you could capture 2 pieces of the enemy by making a sandwich with your's. It's forbidden to make a "cross of 3 and 3" without block spaces (what assure you the win) and there is an alternative way of victory in case of 5 captures from the same player.
