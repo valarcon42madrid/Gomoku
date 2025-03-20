@@ -12,9 +12,12 @@ pip install pygame
 
         TO PLAY:
 
-1) USE: 
+1) USE:
+   
  make run
-2) OR DO: 
+
+2) OR DO:
+   
  python main.py
 
        NOTES:
